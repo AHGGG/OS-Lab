@@ -25,14 +25,15 @@ int isconsuming[NUMBER_OF_CONSUMER] = {0};//消费者是否在消费
 void *producer(void *ptr){
     while (1)
     {
-        printf("producer%d thread id = %d, producer入口，当前empty = %d, full = %d\n", *(int*)ptr, pthread_self(), empty.__align, full.__align);
+        // printf("producer%d thread id = %d, producer入口，当前empty = %d, full = %d\n", *(int*)ptr, pthread_self(), empty.__align, full.__align);
         while (empty.__align <= 0){
-            printf("producer%d thread id = %d, 等待消费者取走货物，empty = %d, full = %d\n", *(int*)ptr, pthread_self(), empty.__align, full.__align);
+            printf("producer%d thread id = %d, sleep 1s等待消费者取走货物，empty = %d, full = %d\n", *(int*)ptr, pthread_self(), empty.__align, full.__align);
             sleep(1);
         }//如果空闲的buffer数量 ≤ 0啥也不动, 也不要去占有mutex
-
-        pthread_mutex_lock(&buffer_mutex);//加锁操作, 拿到lock 才去操作buffer
+        
+        //等待空的buffer有空闲位置， 在使用PV操作时，条件变量需要在互斥锁之前
         sem_wait(&empty);//empty-- 看看empty能够--，能的话代表有空间，使buffer数量--
+        pthread_mutex_lock(&buffer_mutex);//走到这里一定是有empty的buffer，加锁！ 拿到lock 才去操作buffer！！！
 
         //找到第一个不是1的bufferindex
         int i, product_index = -1;
@@ -40,16 +41,22 @@ void *producer(void *ptr){
         {
             if(buffer[i] == 0){
                 product_index = i;
+                break;//找到一个为空的buffer，就停止寻找
             }
         }
-        
+        if(product_index == -1){
+            printf("\t\t\t\t\tproducer%d 没有找到buffer中为0的地方，没有找到能放货物的buffer, product_index = %d, 当前empty.__align\n", *(int*)ptr, product_index, empty.__align);
+            continue;
+        }
         // //产品放入buffer
-        buffer[product_index] = proCount++;
+        buffer[product_index] = ++proCount;
         printf("producer%d 生产货物%d, 放在了buffer[%d]里\n", *(int*)ptr, proCount, product_index);
+        // sleep(1);
         // int product_index = (proCount + 1) % SIEZE_OF_BUFFER;
 
-        sem_post(&full);
         pthread_mutex_unlock(&buffer_mutex);//unlock
+        sem_post(&full);
+        sleep(1);
     }
     
 }
@@ -57,30 +64,38 @@ void *producer(void *ptr){
 void *consumer(void *ptr){
     while (1)
     {
-        printf("\t\t\t\t\tconsumer%d thread id = %d, comsumer入口，当前empty = %d, full = %d\n", *(int*)ptr, pthread_self(), empty.__align, full.__align);
+        // printf("\t\t\t\t\t---->consumer%d thread id = %d, comsumer入口，当前empty = %d, full = %d\n", *(int*)ptr, pthread_self(), empty.__align, full.__align);
         while (full.__align <= 0){
-            printf("\t\t\t\t\tconsumer%d thread id = %d, 等待生产者生产货物，empty = %d, full = %d\n", *(int*)ptr, pthread_self(), empty.__align, full.__align);
+            printf("\t\t\t\t\tconsumer%d thread id = %d, sleep 1s等待生产者生产货物，empty = %d, full = %d\n", *(int*)ptr, pthread_self(), empty.__align, full.__align);
             sleep(1);
         }//如果满的buffer数量 ≤ 0啥也不动, 也不要去占有mutex
-
+        sem_wait(&full);
         pthread_mutex_lock(&buffer_mutex);//加锁再操作
-        sem_wait(&full);//full-- full--，能的话代表有满的buffer
+        //full-- full--，能的话代表有满的buffer
         
         //找到第一个存放有东西的地方
         int i, product_index = -1;
         for (i = 0; i < SIEZE_OF_BUFFER; i++)
         {
+            // printf("i = %d\n", i);
             if(buffer[i] != 0){
                 product_index = i;
+                // printf("找到第一个有东西的buffer\n");
+                break;//找到一个就跳出去
             }
         }
-
+        if(product_index == -1){
+            printf("\t\t\t\t\tcomsumer%d 没有找到buffer中不为0的地方，没有找到装有货物的buffer, product_index = %d, 当前full.__align\n", *(int*)ptr, product_index, full.__align);
+            continue;
+        }
         //消费者动作，要清理buffer？？
         printf("\t\t\t\t\tcomsumer%d 取走 buffer[%d]里的货物-->%d\n", *(int*)ptr, product_index, buffer[product_index]);
+        // sleep(1);
         buffer[product_index] = 0;
 
-        sem_post(&empty);
         pthread_mutex_unlock(&buffer_mutex);//unlock
+        sem_post(&empty);
+        sleep(1);
     }
 }
 

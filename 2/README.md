@@ -15,6 +15,23 @@
 - man semaphore.h:也是POSIX里的。
 [![gglb3n.png](https://z3.ax1x.com/2021/05/16/gglb3n.png)](https://imgtu.com/i/gglb3n)
 
+- C语言读写文件：
+- 字符读写函数  ：fgetc和fputc
+- 字符串读写函数：fgets和fputs;fgets(字符数组名,n,文件指针);fputs(字符串,文件指针);
+- 数据块读写函数：freed和fwrite;fread(buffer,size,count,fp);fwrite(buffer,size,count,fp);
+- 格式化读写函数：fscanf和fprinf;fscanf(文件指针,格式字符串,输入表列);fprintf(文件指针,格式字符串,输出表列);
+
+- 读写文件的格式：
+- r
+- r+:写入和读取，文件必须存在。在r的基础上增加“可写”
+- rb:二进制模式打开，其他同r
+- rb+:二进制模式打开，其他同r+
+- w:为写入操作打开一个空文件。若文件不存在，则创建一个文件；若给定的文件已经存在，那么它的内容将被清空
+- w+:新建一个文件，先向该文件中写人数据，然后可从该文件中读取数据
+- a:追加 如果不存在就创建
+- a+:在a的基础上增加可读功能
+- wb wb+ ab ab+，同上的rb rb+
+
 
 ---
 

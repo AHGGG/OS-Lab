@@ -66,7 +66,8 @@ int main(int argc, char **argv){
     
     for(j = 0; j < NUMBER_OF_PH; j++){
         if(pthread_join(id[j],NULL) != 0){
-            printf("wait philosopherThread[%d] exit error",i);//waiting the chile_thread exit
+            printf("wait philosopherThread[%d] exit error",i);
+            // sleep(3);//waiting the chile_thread exit
         }else{
             printf("childthread exit\n"); 
         }
