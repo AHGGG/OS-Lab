@@ -41,7 +41,7 @@ struct   sembuf{
 - C语言读写文件：
 - 字符读写函数  ：fgetc和fputc
 - 字符串读写函数：fgets和fputs;fgets(字符数组名,n,文件指针);fputs(字符串,文件指针);
-- 数据块读写函数：freed和fwrite;fread(buffer,size,count,fp);fwrite(buffer,size,count,fp);
+- 数据块读写函数：fread和fwrite;fread(buffer,size,count,fp);fwrite(buffer,size,count,fp);
 - 格式化读写函数：fscanf和fprinf;fscanf(文件指针,格式字符串,输入表列);fprintf(文件指针,格式字符串,输出表列);
 
 ----

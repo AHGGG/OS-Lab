@@ -19,6 +19,8 @@
 
 [更多内容！！见此处]:https://www.cnblogs.com/orlion/p/6258691.html
 
+- man 7 pipe : If all file descriptors referring to the write end of a pipe have been closed, then an attempt to read(2) from the pipe will see end-of-file (read(2) will return 0).  If all file  descriptors  referring  to  the  read end of a pipe have been closed, then a write(2) will cause a SIGPIPE signal to be generated for the calling process.  
+
 ---
 
 #### 错误记录：
