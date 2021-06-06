@@ -2,7 +2,7 @@
 echo 当前进程运行的ID：$$, 传递到脚本的参数个数：$#
 if [ $# -eq 1 ]
 then
-    if [ -f "$1" ]
+    if [ -e "$1" ]
     then
         echo 要检测的文件名:$1
     else
@@ -16,6 +16,8 @@ fi
 
 loop=0
 size=`ls -l | grep $1 | awk  '{print $5}'`
+# who -a | cut -c1-11 打印1-11
+# -c-2 打印前两个字节
 echo 初始文件大小:$size
 
 changetime=0
