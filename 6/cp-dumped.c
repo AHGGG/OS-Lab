@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>//for malloc
 #include <fcntl.h>
+#include <unistd.h>
 
 //定义的时候和形参都要为 src[] 才行 char *src就不行 why？？？
 char *get_file_name(char src[]){
@@ -91,8 +92,8 @@ void cp_once(char *dir, char *des){
 }
 
 void read_recur(char *d_entry, char *cp_des,int is_recur){
-    if(1 == is_recur) printf("\t\t========== %s =================\n", d_entry);
-    else printf("========== %s =================\n", d_entry);
+    if(1 == is_recur) printf("\t\t========== %s , ==== getcwd = :%s ===========\n", d_entry, getcwd(NULL, 0));
+    else printf("========== %s , ==== getcwd = :%s ==========\n", d_entry, getcwd(NULL, 0));
 
     struct dirent *currentdp;
     struct stat buffer;
@@ -164,7 +165,7 @@ void read_recur(char *d_entry, char *cp_des,int is_recur){
                     //啥也不做, printf("currentdp->d_name:%s, 识别到当前目录\n", currentdp->d_name);
                 }else{
                     //是目录, 但不是. 或 .. ,就再次调用
-                    printf(">>>>>>>>>>>>>>>%s是目录, 但是不是. 和 .., 下面进行递归调用=================\n", newpath);
+                    printf(">>>>>>>>>>>>>>>%s是目录, 但是不是. 和 .., 下面进行递归调用, ==== getcwd = :%s =======\n", newpath, getcwd(NULL, 0));
                     read_recur(newpath, cp_des, 1); 
                 }
             }else if((buffer.st_mode & S_IFMT) == S_IFREG){
@@ -174,8 +175,8 @@ void read_recur(char *d_entry, char *cp_des,int is_recur){
         }
         
         closedir(dir);
-        if(1 == is_recur) printf("\t\t========== %s =================\n\n", d_entry);
-        else printf("========== %s =================\n\n", d_entry);
+        if(1 == is_recur) printf("\t\t========== %s =========\n\n", d_entry);
+        else printf("========== %s , ==== getcwd = :%s =========\n", d_entry, getcwd(NULL, 0));
     }else if((buffer.st_mode & S_IFMT) == S_IFREG){
         //如果传入的argv[2]是普通文件
         cp_once(d_entry, cp_des);
